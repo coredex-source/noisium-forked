@@ -44,5 +44,8 @@
   },
   "suggests": {
     "c2me": "*"
+  },
+  "breaks": {
+    "biox": "*"
   }
 }
