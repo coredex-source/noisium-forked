@@ -4,24 +4,41 @@
 
 Optimises worldgen performance for a better gameplay experience.
 
-In the best case measured so far, the improvements can be up to a 1.25% speedup per thread when generating new chunks in vanilla
-Minecraft.  
-With 4 threads, that means that there is a 5% increase in world generation speed in total.  
-This was benchmarked on an Intel i5-7500, on 1.20.1 Fabric with Chunky, by generating a 2000x2000 block area using `/chunky radius 1000`.  
-Results may vary based on hardware and thread counts (e.x. faster hardware may benefit less).
-
-![5 CPU benchmarks, by Uniter, raccoonman2 and ishland](docs/benchmarks/5_cpu_benchmarks_by_uniter_raccoonman2_and_ishland.png)
-
 Noisium changes some world generation functions that other mods don't touch, to fill in the gaps left by other performance optimisation
 mods.
 Most notably, `NoiseChunkGenerator#populateNoise` is optimised to speed up block state placement when generating new chunks.  
 Setting the block state via abstractions/built-in functions is bypassed. Instead, the block states are set directly in the palette storage,
 thus bypassing calculations Minecraft does that are normally useful when block states are set, but when generating the world only slow it
-down. This is a cycle optimisation.  
+down.  
 There are also 3 other optimisations, that increase biome population speed, block state sampling speed and chunk unlocking speed (Minecraft
 1.21 and up) during world generation.
 
 Noisium has full 1:1 parity with vanilla Minecraft world generation (world generation without Noisium).
+
+## Benchmarks
+
+### Minecraft 1.20.4 and lower
+
+System         | Vanilla 1.20.1  | Noisium `v2.3.0` | Difference
+---------------|-----------------|------------------|-----------------------------
+Intel i7-9750H | -               | -                |-30% (measured via profiler)
+
+### Minecraft 1.20.5 and up
+
+In Minecraft 1.20.5 and up, Noisium has less effectiveness than in previous versions of Minecraft.  
+In the best case measured so far, the improvements can be up to a 5% speedup when generating new chunks in vanilla Minecraft.  
+
+System                 | Vanilla 1.20.1 | Noisium `v2.3.0` | Difference
+-----------------------|----------------|------------------|----------------
+Intel Xeon Silver 4510 | 07:48          | 07:24            | -5.1%
+Intel Xeon Gold 5218R  | 05:31          | 05:38            | None measured*
+Intel i5-7500          | 05:25          | 05:28            | None measured*
+AMD Ryzen 5800X3D      | 03:00          | 03:00            | None measured*
+AMD Ryzen 5600X        | 03:23          | 03:23            | None measured*
+AMD Ryzen 5500U        | 04:12          | 04:05            | None measured*
+
+*: The measured difference was less than 5%.  
+Results may vary based on hardware (e.x. faster hardware may benefit less).
 
 ## Dependencies
 
@@ -34,7 +51,7 @@ None.
 ### Compatible mods
 
 Noisium should be compatible with most, if not all, of the popular optimisation mods currently on Modrinth/CurseForge for
-Minecraft `1.20.x`, since Noisium aims to fill in the gaps in performance optimisation left by other mods.
+Noisium's supported Minecraft versions, since Noisium aims to fill in the gaps in performance optimisation left by other mods.
 This includes (but is not limited to) C2ME, Lithium, Nvidium, and Sodium.
 
 - C2ME: every world generation thread runs faster. The biome population multithreading is also done in a much better/more performant way in
