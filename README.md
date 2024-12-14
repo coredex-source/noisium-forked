@@ -20,22 +20,22 @@ Noisium has full 1:1 parity with vanilla Minecraft world generation (world gener
 ### Minecraft 1.20.4 and lower
 
 System         | Vanilla 1.20.1  | Noisium `v2.3.0` | Difference
----------------|-----------------|------------------|-----------------------------
-Intel i7-9750H | -               | -                |-30% (measured via profiler)
+---------------|-----------------|------------------|------------------------------
+Intel i7-9750H | -               | -                | -30% (measured via profiler)
 
 ### Minecraft 1.20.5 and up
 
 In Minecraft 1.20.5 and up, Noisium has less effectiveness than in previous versions of Minecraft.  
 In the best case measured so far, the improvements can be up to a 5% speedup when generating new chunks in vanilla Minecraft.  
 
-System                 | Vanilla 1.20.1 | Noisium `v2.3.0` | Difference
+System                 | Vanilla 1.20.5 | Noisium `v2.3.0` | Difference
 -----------------------|----------------|------------------|----------------
-Intel Xeon Silver 4510 | 07:48          | 07:24            | -5.1%
-Intel Xeon Gold 5218R  | 05:31          | 05:38            | None measured*
-Intel i5-7500          | 05:25          | 05:28            | None measured*
+Intel i5-7500          | 07:48          | 07:24            | -5.1%
+AMD Ryzen 5500U        | 05:31          | 05:38            | None measured*
+Intel Xeon Gold 5218R  | 05:25          | 05:28            | None measured*
+AMD Ryzen 5600X        | 04:12          | 04:05            | None measured*
+Intel Xeon Silver 4510 | 03:23          | 03:23            | None measured*
 AMD Ryzen 5800X3D      | 03:00          | 03:00            | None measured*
-AMD Ryzen 5600X        | 03:23          | 03:23            | None measured*
-AMD Ryzen 5500U        | 04:12          | 04:05            | None measured*
 
 *: The measured difference was less than 5%.  
 Results may vary based on hardware (e.x. faster hardware may benefit less).
