@@ -15,30 +15,11 @@ There are also 3 other optimisations, that increase biome population speed, bloc
 
 Noisium has full 1:1 parity with vanilla Minecraft world generation (world generation without Noisium).
 
-## Benchmarks
+The performance difference is variable, between a few seconds to a few dozen seconds faster depending on the amount of chunks generated.  
+See the below Spark profiles for the differences in performance:
 
-### Minecraft 1.20.4 and lower
-
-System         | Vanilla 1.20.1  | Noisium `v2.3.0` | Difference
----------------|-----------------|------------------|------------------------------
-Intel i7-9750H | -               | -                | -30% (measured via profiler)
-
-### Minecraft 1.20.5 and up
-
-In Minecraft 1.20.5 and up, Noisium has less effectiveness than in previous versions of Minecraft.  
-In the best case measured so far, the improvements can be up to a 5% speedup when generating new chunks in vanilla Minecraft.  
-
-System                 | Vanilla 1.20.5 | Noisium `v2.3.0` | Difference
------------------------|----------------|------------------|----------------
-Intel i5-7500          | 07:48          | 07:24            | -5.1%
-AMD Ryzen 5500U        | 05:31          | 05:38            | None measured*
-Intel Xeon Gold 5218R  | 05:25          | 05:28            | None measured*
-AMD Ryzen 5600X        | 04:12          | 04:05            | None measured*
-Intel Xeon Silver 4510 | 03:23          | 03:23            | None measured*
-AMD Ryzen 5800X3D      | 03:00          | 03:00            | None measured*
-
-*: The measured difference was less than 5%.  
-Results may vary based on hardware (e.x. faster hardware may benefit less).
+- [Vanilla](docs/benchmarks/vanilla_minecraft_1_20_1.sparkprofile)
+- [With Noisium](docs/benchmarks/noisium_minecraft_1_20_1.sparkprofile)
 
 ## Dependencies
 
