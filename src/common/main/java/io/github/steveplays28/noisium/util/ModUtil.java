@@ -1,14 +1,11 @@
 package io.github.steveplays28.noisium.util;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
+import net.msrandom.multiplatform.annotations.Expect;
 
-@SuppressWarnings("unused")
-public abstract class ModUtil {
+@Expect
+public class ModUtil {
 	/**
 	 * Checks if a mod is present during loading.
 	 */
-	@ExpectPlatform
-	public static boolean isModPresent(String id) {
-		throw new AssertionError("Platform implementation expected.");
-	}
+	public static boolean isModPresent(String id);
 }

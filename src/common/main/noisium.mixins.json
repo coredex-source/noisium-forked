@@ -5,11 +5,11 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "io.github.steveplays28.noisium.mixin.NoisiumMixinPlugin",
   "mixins": [
-    "ChainedBlockSourceMixin",
-    "ChunkSectionMixin",
-    "GenerationShapeConfigMixin",
-    "NoiseChunkGeneratorMixin",
-    "compat.lithium.LithiumNoiseChunkGeneratorMixin"
+    "MaterialRuleListMixin",
+    "LevelChunkSectionMixin",
+    "NoiseSettingsMixin",
+    "NoiseBasedChunkGeneratorMixin",
+    "compat.lithium.LithiumNoiseBasedChunkGeneratorMixin"
   ],
   "client": [
   ],

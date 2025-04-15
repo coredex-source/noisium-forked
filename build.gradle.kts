@@ -53,6 +53,7 @@ repositories {
     cloche {
         main()
         librariesMinecraft()
+        mavenParchment()
         mavenFabric()
         mavenNeoforged()
         mavenForge()
@@ -76,11 +77,18 @@ cloche {
     }
 
     mappings {
-        fabricIntermediary()
+        official()
     }
 
     targets.all {
         mixins.from(file("src/common/main/${mod_id}.mixins.json"))
+        accessWideners.from(file("src/common/main/${mod_id}.accesswidener"))
+
+        // TODO: Mark c2me as a suggestion and biox as breaking
+
+        dependencies {
+            implementation("org.jetbrains:annotations:26.0.2")
+        }
 
         runs {
             client()
@@ -94,7 +102,7 @@ cloche {
         dependsOn(fabricCommon)
 
         val fabric_loader_version: String by project
-        loaderVersion = fabric_loader_version
+        loaderVersion.set(fabric_loader_version)
 
         includedClient()
     }
@@ -133,41 +141,36 @@ cloche {
 
     forge("forge:1.20") {
         minecraftVersion.set("1.20")
-
-        loaderVersion = "46.0.14"
+        loaderVersion.set("46.0.14")
     }
 
     forge("forge:1.20.1") {
         minecraftVersion.set("1.20.1")
-
-        loaderVersion = "47.4.0"
+        loaderVersion.set("47.4.0")
     }
 
     forge("forge:1.20.2") {
         minecraftVersion.set("1.20.2")
-
-        loaderVersion = "48.1.0"
+        loaderVersion.set("48.1.0")
     }
 
     forge("forge:1.20.3") {
         minecraftVersion.set("1.20.3")
-
-        loaderVersion = "49.0.2"
+        loaderVersion.set("49.0.2")
     }
 
     forge("forge:1.20.4") {
         minecraftVersion.set("1.20.4")
-
-        loaderVersion = "49.2.0"
+        loaderVersion.set("49.2.0")
     }
 
     targets.all {
         when(minecraftVersion.get()) {
-            "1.20" -> mappings { yarn("build.1") }
-            "1.20.1" -> mappings { yarn("build.10") }
-            "1.20.2" -> mappings { yarn("build.4") }
-            "1.20.3" -> mappings { yarn("build.1") }
-            "1.20.4" -> mappings { yarn("build.3") }
+            "1.20.4" -> mappings { parchment("2024.04.14") }
+            "1.20.3" -> mappings { parchment("2023.12.31") }
+            "1.20.2" -> mappings { parchment("2023.12.10") }
+            "1.20.1" -> mappings { parchment("2023.09.03") }
+            "1.20" -> mappings { parchment("2023.09.03", "1.20.1") }
         }
     }
 }

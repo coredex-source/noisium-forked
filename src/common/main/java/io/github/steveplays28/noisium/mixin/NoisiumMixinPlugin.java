@@ -15,8 +15,8 @@ public class NoisiumMixinPlugin implements IMixinConfigPlugin {
 	private static final Supplier<Boolean> TRUE = () -> true;
 
 	private static final Map<String, Supplier<Boolean>> CONDITIONS = ImmutableMap.of(
-			"io.github.steveplays28.noisium.mixin.NoiseChunkGeneratorMixin", () -> !NoisiumLithiumCompat.isLithiumLoaded(),
-			"io.github.steveplays28.noisium.mixin.compat.lithium.LithiumNoiseChunkGeneratorMixin", NoisiumLithiumCompat::isLithiumLoaded
+			"io.github.steveplays28.noisium.mixin.NoiseBasedChunkGeneratorMixin", () -> !NoisiumLithiumCompat.isLithiumLoaded(),
+			"io.github.steveplays28.noisium.mixin.compat.lithium.LithiumNoiseBasedChunkGeneratorMixin", NoisiumLithiumCompat::isLithiumLoaded
 	);
 
 	@Override
