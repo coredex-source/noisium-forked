@@ -104,6 +104,10 @@ cloche {
         val fabric_loader_version: String by project
         loaderVersion.set(fabric_loader_version)
 
+        metadata {
+            entrypoint("main", "io.github.steveplays28.noisium.fabric.NoisiumFabric")
+        }
+
         includedClient()
     }
 
