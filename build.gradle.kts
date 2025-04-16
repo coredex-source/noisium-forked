@@ -74,6 +74,7 @@ cloche {
         val mod_authors: String by project
         mod_authors.split(',').forEach(::author)
         version = mod_version
+        // TODO: Add source and issues links
     }
 
     mappings {
@@ -141,6 +142,57 @@ cloche {
             val mod_menu_version: String = "7.2.2"
             modRuntimeOnly("com.terraformersmc:modmenu:${mod_menu_version}")
         }
+    }
+
+    fabric("fabric:1.20.2") {
+        minecraftVersion.set("1.20.2")
+    }
+
+    fabric("fabric:1.20.3") {
+        minecraftVersion.set("1.20.3")
+    }
+
+    fabric("fabric:1.20.4") {
+        minecraftVersion.set("1.20.4")
+    }
+
+    fabric("fabric:1.20.5") {
+        minecraftVersion.set("1.20.5")
+    }
+
+    fabric("fabric:1.20.6") {
+        minecraftVersion.set("1.20.6")
+    }
+
+    fabric("fabric:1.21") {
+        minecraftVersion.set("1.21")
+    }
+
+    fabric("fabric:1.21.1") {
+        minecraftVersion.set("1.21.1")
+
+        dependencies {
+            val fabric_api_version: String = "0.115.4+1.21.1"
+            modRuntimeOnly("net.fabricmc.fabric-api:fabric-api:${fabric_api_version}")
+            val mod_menu_version: String = "11.0.3"
+            modRuntimeOnly("com.terraformersmc:modmenu:${mod_menu_version}")
+        }
+    }
+
+    fabric("fabric:1.21.2") {
+        minecraftVersion.set("1.21.2")
+    }
+
+    fabric("fabric:1.21.3") {
+        minecraftVersion.set("1.21.3")
+    }
+
+    fabric("fabric:1.21.4") {
+        minecraftVersion.set("1.21.4")
+    }
+
+    fabric("fabric:1.21.5") {
+        minecraftVersion.set("1.21.5")
     }
 
     forge("forge:1.20") {
