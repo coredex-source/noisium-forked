@@ -60,6 +60,7 @@ repositories {
     }
 
     maven(url = "https://maven.terraformersmc.com/")
+    maven(url = "https://api.modrinth.com/maven")
 }
 
 cloche {
@@ -79,22 +80,6 @@ cloche {
 
     mappings {
         official()
-    }
-
-    targets.all {
-        mixins.from(file("src/common/main/${mod_id}.mixins.json"))
-        accessWideners.from(file("src/common/main/${mod_id}.accesswidener"))
-
-        // TODO: Mark c2me as a suggestion and biox as breaking
-
-        dependencies {
-            implementation("org.jetbrains:annotations:26.0.2")
-        }
-
-        runs {
-            client()
-            server()
-        }
     }
 
     val fabricCommon = common("fabric:common") {}
@@ -172,10 +157,14 @@ cloche {
         minecraftVersion.set("1.21.1")
 
         dependencies {
-            val fabric_api_version: String = "0.115.4+1.21.1"
+            val fabric_api_version: String = "0.115.6+1.21.1"
             modRuntimeOnly("net.fabricmc.fabric-api:fabric-api:${fabric_api_version}")
             val mod_menu_version: String = "11.0.3"
             modRuntimeOnly("com.terraformersmc:modmenu:${mod_menu_version}")
+            val lithium_version: String = "mc1.21.1-0.15.0-fabric"
+            modRuntimeOnly("maven.modrinth:lithium:${lithium_version}")
+            val c2me_version: String = "0.3.0+alpha.0.319+1.21.1"
+            modRuntimeOnly("maven.modrinth:c2me-fabric:${c2me_version}")
         }
     }
 
@@ -227,6 +216,25 @@ cloche {
             "1.20.2" -> mappings { parchment("2023.12.10") }
             "1.20.1" -> mappings { parchment("2023.09.03") }
             "1.20" -> mappings { parchment("2023.09.03", "1.20.1") }
+        }
+    }
+
+    // This target is at the bottom instead of at the top, as a workaround for terrarium-earth/cloche #12. See also terrarium-earth/cloche #59.
+    // #12: https://github.com/terrarium-earth/cloche/issues/12
+    // #59: https://github.com/terrarium-earth/cloche/issues/59
+    targets.all {
+        mixins.from(file("src/common/main/${mod_id}.mixins.json"))
+        accessWideners.from(file("src/common/main/${mod_id}.accesswidener"))
+
+        // TODO: Mark c2me as a suggestion and biox as breaking
+
+        dependencies {
+            implementation("org.jetbrains:annotations:26.0.2")
+        }
+
+        runs {
+            client()
+            server()
         }
     }
 }
