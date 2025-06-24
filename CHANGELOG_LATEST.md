@@ -1,3 +1,3 @@
 ### Added
 
-- Minecraft 1.21.5 compatibility
+- Minecraft 1.21.6 compatibility
