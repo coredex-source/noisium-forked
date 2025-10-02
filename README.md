@@ -25,7 +25,7 @@ See the below Spark profiles for the differences in performance:
 
 ### Required
 
-None.
+None. 
 
 ## Compatibility info
 
