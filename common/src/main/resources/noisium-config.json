@@ -1,0 +1,7 @@
+{
+  "noiseChunkGenerator": true,
+  "generationShapeConfig": true,
+  "chunkSection": true,
+  "chainedBlockSource": true,
+  "useGuiGraphics": true
+}

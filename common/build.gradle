@@ -20,6 +20,8 @@ dependencies {
 
     // Mixin Extras
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${rootProject.mixin_extras_version}"))
+    // JSON parsing for default config loading (compileOnly so platforms can choose runtime)
+    compileOnly "com.google.code.gson:gson:2.10.1"
 }
 
 publishing {

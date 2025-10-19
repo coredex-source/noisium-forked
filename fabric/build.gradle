@@ -7,6 +7,11 @@ plugins {
 
 def archivesNameFabric = "${rootProject.archives_base_name}-fabric"
 
+repositories {
+    maven { url "https://maven.shedaniel.me/" }
+    maven { url "https://api.modrinth.com/maven" }
+}
+
 architectury {
     platformSetupLoomIde()
     fabric()
@@ -38,7 +43,13 @@ dependencies {
     modRuntimeOnly "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
     // Mod Menu
+    modCompileOnly "maven.modrinth:modmenu:${rootProject.mod_menu_version}"
     modRuntimeOnly "maven.modrinth:modmenu:${rootProject.mod_menu_version}"
+
+    // Cloth Config for config screen
+    modImplementation("me.shedaniel.cloth:cloth-config-fabric:${rootProject.cloth_config_version}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }

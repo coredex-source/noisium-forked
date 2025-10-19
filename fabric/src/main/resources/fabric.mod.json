@@ -33,6 +33,9 @@
   "entrypoints": {
     "main": [
       "io.github.steveplays28.noisium.fabric.NoisiumFabric"
+    ],
+    "modmenu": [
+      "io.github.steveplays28.noisium.fabric.NoisiumModMenuIntegration"
     ]
   },
   "mixins": [

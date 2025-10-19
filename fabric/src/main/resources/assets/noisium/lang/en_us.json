@@ -1,0 +1,15 @@
+{
+  "config.noisium.title": "Noisium Configuration",
+  "config.noisium.category.mixins": "Optimizations & Mixins",
+  "config.noisium.category.general": "General Settings",
+  "config.noisium.noiseChunkGenerator": "Noise Chunk Generator Optimization",
+  "config.noisium.noiseChunkGenerator.tooltip": "Optimizes NoiseChunkGenerator#populateNoise for 20-30% speedup in world generation. Requires restart.",
+  "config.noisium.generationShapeConfig": "Generation Shape Config Caching",
+  "config.noisium.generationShapeConfig.tooltip": "Caches GenerationShapeConfig computations. Requires restart.",
+  "config.noisium.chunkSection": "Chunk Section Optimization",
+  "config.noisium.chunkSection.tooltip": "Optimizes ChunkSection#populateBiomes axis order. Requires restart.",
+  "config.noisium.chainedBlockSource": "Chained Block Source Optimization",
+  "config.noisium.chainedBlockSource.tooltip": "Micro-optimization for ChainedBlockSource lookups. Requires restart.",
+  "config.noisium.useGuiGraphics": "Use GuiGraphics Acceleration",
+  "config.noisium.useGuiGraphics.tooltip": "Enables GuiGraphics-accelerated rendering paths when available."
+}
