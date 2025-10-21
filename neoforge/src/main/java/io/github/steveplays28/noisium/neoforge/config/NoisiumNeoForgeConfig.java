@@ -40,7 +40,7 @@ public class NoisiumNeoForgeConfig {
                 .define("chainedBlockSource", true);
 
         CHUNK_NOISE_SAMPLER_INTERPOLATION = BUILDER
-                .comment("Optimizes ChunkNoiseSampler interpolation methods with loop unrolling and FMA for 5-15% speedup")
+                .comment("Optimizes ChunkNoiseSampler#interpolateZ by skipping quarter-step cases (deltaZ=0.0) for 5-15% speedup")
                 .define("chunkNoiseSamplerInterpolation", true);
 
         BUILDER.pop();

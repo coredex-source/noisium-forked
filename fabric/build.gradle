@@ -42,9 +42,9 @@ dependencies {
     // Fabric API
     modRuntimeOnly "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
-    // Mod Menu (temporarily disabled for testing optimization)
-    // modCompileOnly "maven.modrinth:modmenu:${rootProject.mod_menu_version}"
-    // modRuntimeOnly "maven.modrinth:modmenu:${rootProject.mod_menu_version}"
+    // Mod Menu
+    modCompileOnly "maven.modrinth:modmenu:${rootProject.mod_menu_version}"
+    modRuntimeOnly "maven.modrinth:modmenu:${rootProject.mod_menu_version}"
 
     // Cloth Config for config screen
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:${rootProject.cloth_config_version}") {
