@@ -29,7 +29,7 @@ import java.util.List;
  * - interpolateY: 5.6% of all calls
  * - Delta values heavily quantized to quarters: 0.0, 0.25, 0.5, 0.75
  * 
- * Combined expected performance gain: 8-15% speedup in noise population
+ * Combined expected performance gain: 3-10% speedup in noise population
  * 
  * @author coredex-source
  * @see <a href="https://github.com/coredex-source/noisium-forked/blob/experimental/CNS-interpolation/docs/ChunkNoiseSampler_1_21_10_analysis.md">Runtime Analysis</a>
