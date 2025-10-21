@@ -4,6 +4,8 @@
 *.iml
 *.ipr
 *.iws
+POTENTIAL_FEATURES.md
+FUTURE_FEATURES.md
 
 # IntelliJ
 out/

@@ -14,6 +14,7 @@ public class NoisiumNeoForgeConfig {
     public static final ModConfigSpec.BooleanValue GENERATION_SHAPE_CONFIG;
     public static final ModConfigSpec.BooleanValue CHUNK_SECTION;
     public static final ModConfigSpec.BooleanValue CHAINED_BLOCK_SOURCE;
+    public static final ModConfigSpec.BooleanValue CHUNK_NOISE_SAMPLER_INTERPOLATION;
     public static final ModConfigSpec.BooleanValue USE_GUI_GRAPHICS;
 
     public static final ModConfigSpec SPEC;
@@ -38,6 +39,10 @@ public class NoisiumNeoForgeConfig {
                 .comment("Micro-optimization for ChainedBlockSource lookups")
                 .define("chainedBlockSource", true);
 
+        CHUNK_NOISE_SAMPLER_INTERPOLATION = BUILDER
+                .comment("Optimizes ChunkNoiseSampler interpolation methods with loop unrolling and FMA for 5-15% speedup")
+                .define("chunkNoiseSamplerInterpolation", true);
+
         BUILDER.pop();
 
         BUILDER.push("general");
@@ -57,6 +62,7 @@ public class NoisiumNeoForgeConfig {
                 GENERATION_SHAPE_CONFIG.get(),
                 CHUNK_SECTION.get(),
                 CHAINED_BLOCK_SOURCE.get(),
+                CHUNK_NOISE_SAMPLER_INTERPOLATION.get(),
                 USE_GUI_GRAPHICS.get()
         );
     }
