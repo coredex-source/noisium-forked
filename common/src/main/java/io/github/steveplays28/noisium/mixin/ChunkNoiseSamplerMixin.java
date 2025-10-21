@@ -18,11 +18,6 @@ import java.util.List;
 /**
  * Optimizes ChunkNoiseSampler interpolation methods for significant performance gains.
  * 
- * Optimizations applied:
- * 1. Quarter-step interpolation - Specialized paths for common delta values (0.0, 0.25, 0.5, 0.75)
- * 2. FMA (Fused Multiply-Add) - Uses Math.fma() for better precision and performance
- * 3. Runtime data-driven optimization - Targets interpolateZ (80.8% of calls) first
- * 
  * Based on 1.1M+ runtime call analysis:
  * - interpolateZ: 80.8% of all calls
  * - interpolateX: 21.4% of all calls
