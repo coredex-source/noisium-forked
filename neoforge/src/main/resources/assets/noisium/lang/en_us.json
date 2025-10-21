@@ -10,6 +10,8 @@
   "config.noisium.chunkSection.tooltip": "Optimizes ChunkSection#populateBiomes axis order. Requires restart.",
   "config.noisium.chainedBlockSource": "Chained Block Source Optimization",
   "config.noisium.chainedBlockSource.tooltip": "Micro-optimization for ChainedBlockSource lookups. Requires restart.",
+  "config.noisium.chunkNoiseSamplerInterpolation": "ChunkNoiseSampler Interpolation Optimization",
+  "config.noisium.chunkNoiseSamplerInterpolation.tooltip": "Optimizes ChunkNoiseSampler#interpolateZ by skipping quarter-step cases (deltaZ=0.0). Requires restart.",
   "config.noisium.useGuiGraphics": "Use GuiGraphics Acceleration",
   "config.noisium.useGuiGraphics.tooltip": "Enables GuiGraphics-accelerated rendering paths when available.",
   
@@ -31,5 +33,7 @@
   "noisium.configuration.chunkSection": "Chunk Section Optimization",
   "noisium.configuration.chunkSection.tooltip": "Optimizes chunk section processing (requires restart)",
   "noisium.configuration.chainedBlockSource": "Chained Block Source Optimization",
-  "noisium.configuration.chainedBlockSource.tooltip": "Optimizes chained block source operations (requires restart)"
+  "noisium.configuration.chainedBlockSource.tooltip": "Optimizes chained block source operations (requires restart)",
+  "noisium.configuration.chunkNoiseSamplerInterpolation": "ChunkNoiseSampler Interpolation Optimization",
+  "noisium.configuration.chunkNoiseSamplerInterpolation.tooltip": "Optimizes ChunkNoiseSampler#interpolateZ by skipping quarter-step cases (deltaZ=0.0). Requires restart."
 }

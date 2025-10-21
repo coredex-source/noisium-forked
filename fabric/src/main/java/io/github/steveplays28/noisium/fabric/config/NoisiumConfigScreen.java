@@ -58,6 +58,14 @@ public class NoisiumConfigScreen {
                 .setSaveConsumer(value -> config.chainedBlockSource = value)
                 .build());
 
+        mixins.addEntry(entryBuilder.startBooleanToggle(
+                        Text.translatable("config.noisium.chunkNoiseSamplerInterpolation"),
+                        config.chunkNoiseSamplerInterpolation)
+                .setDefaultValue(true)
+                .setTooltip(Text.translatable("config.noisium.chunkNoiseSamplerInterpolation.tooltip"))
+                .setSaveConsumer(value -> config.chunkNoiseSamplerInterpolation = value)
+                .build());
+
         ConfigCategory general = builder.getOrCreateCategory(Text.translatable("config.noisium.category.general"));
 
         general.addEntry(entryBuilder.startBooleanToggle(

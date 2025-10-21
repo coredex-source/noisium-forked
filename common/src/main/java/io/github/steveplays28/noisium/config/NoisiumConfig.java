@@ -21,6 +21,7 @@ public class NoisiumConfig {
     public boolean generationShapeConfig = true;
     public boolean chunkSection = true;
     public boolean chainedBlockSource = true;
+    public boolean chunkNoiseSamplerInterpolation = true;
 
     // Additional toggles
     /** Allows using GuiGraphics-accelerated paths when available */
@@ -68,11 +69,13 @@ public class NoisiumConfig {
 
     /** Updates this config instance from platform config values */
     public void update(boolean noiseChunkGenerator, boolean generationShapeConfig, 
-                      boolean chunkSection, boolean chainedBlockSource, boolean useGuiGraphics) {
+                      boolean chunkSection, boolean chainedBlockSource, 
+                      boolean chunkNoiseSamplerInterpolation, boolean useGuiGraphics) {
         this.noiseChunkGenerator = noiseChunkGenerator;
         this.generationShapeConfig = generationShapeConfig;
         this.chunkSection = chunkSection;
         this.chainedBlockSource = chainedBlockSource;
+        this.chunkNoiseSamplerInterpolation = chunkNoiseSamplerInterpolation;
         this.useGuiGraphics = useGuiGraphics;
     }
 }

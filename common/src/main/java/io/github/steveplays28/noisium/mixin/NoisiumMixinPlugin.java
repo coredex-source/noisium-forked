@@ -38,6 +38,8 @@ public class NoisiumMixinPlugin implements IMixinConfigPlugin {
 				return NoisiumConfig.get().chunkSection;
 			case "ChainedBlockSourceMixin":
 				return NoisiumConfig.get().chainedBlockSource;
+			case "ChunkNoiseSamplerMixin":
+				return NoisiumConfig.get().chunkNoiseSamplerInterpolation;
 			default:
 				return TRUE.get();
 		}
