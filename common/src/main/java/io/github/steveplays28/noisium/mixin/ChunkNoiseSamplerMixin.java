@@ -6,7 +6,7 @@ import net.minecraft.world.gen.chunk.ChunkNoiseSampler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -36,10 +36,10 @@ import java.util.List;
 public abstract class ChunkNoiseSamplerMixin {
 	/**
 	 * Shadow field to access the density interpolators list.
-	 * In 1.21.10, ChunkNoiseSampler changed from double[] buffer to List<DensityInterpolator>.
+	 * In 1.21.10, ChunkNoiseSampler uses List<DensityInterpolator>.
 	 */
 	@Shadow
-	private List<Object> interpolators; // Using Object to avoid import issues, will cast to actual type
+	private List<?> interpolators; // Use wildcard to avoid import issues
 	
 	@Unique
 	private static boolean noisium$loggingEnabled = false;
@@ -55,6 +55,9 @@ public abstract class ChunkNoiseSamplerMixin {
 	
 	@Unique
 	private static long noisium$interpolateZCalls = 0;
+	
+	@Unique
+	private static long noisium$quarterStepCount = 0;
 	
 	static {
 		// Initialize optimization state based on config
@@ -92,106 +95,35 @@ public abstract class ChunkNoiseSamplerMixin {
 	
 	/**
 	 * Log calls to interpolateZ to understand the new architecture.
+	 * Also count quarter-step opportunities for optimization analysis.
 	 */
 	@Inject(method = "interpolateZ", at = @At("HEAD"))
 	public void noisium$logInterpolateZ(int blockZ, double deltaZ, CallbackInfo ci) {
-		if (noisium$loggingEnabled && (++noisium$interpolateZCalls % 1000 == 0)) {
-			Noisium.LOGGER.info("interpolateZ called {} times (blockZ={}, deltaZ={})", noisium$interpolateZCalls, blockZ, deltaZ);
-		}
-	}
-	
-	/**
-	 * @author Steveplays28 (Noisium)  
-	 * @reason Optimize interpolateZ method with quarter-step optimization targeting 80.8% of interpolation calls
-	 */
-	@Overwrite
-	public void interpolateZ(int blockZ, double deltaZ) {
-		// Increment call counter for logging
-		if (noisium$loggingEnabled && (++noisium$interpolateZCalls % 1000 == 0)) {
-			Noisium.LOGGER.info("interpolateZ called {} times (blockZ={}, deltaZ={})", noisium$interpolateZCalls, blockZ, deltaZ);
-		}
-
-		if (!noisium$optimizationEnabled) {
-			// Call original implementation behavior
-			noisium$originalInterpolateZ(blockZ, deltaZ);
-			return;
-		}
-
-		// Use optimized interpolation logic
-		noisium$optimizedInterpolateZ(blockZ, deltaZ);
-	}
-
-	/**
-	 * Original interpolateZ implementation as fallback when optimization is disabled.
-	 * Iterates through all interpolators and calls their interpolateZ methods.
-	 */
-	@Unique
-	private void noisium$originalInterpolateZ(int blockZ, double deltaZ) {
-		// Based on List<DensityInterpolator> architecture discovered in 1.21.10
-		// Original behavior: call interpolateZ on each density interpolator
-		if (this.interpolators != null) {
-			for (Object interpolator : this.interpolators) {
-				try {
-					// Call interpolateZ method on each interpolator using reflection
-					// This avoids import/classpath issues while maintaining functionality
-					interpolator.getClass().getMethod("interpolateZ", int.class, double.class)
-						.invoke(interpolator, blockZ, deltaZ);
-				} catch (Exception e) {
-					// Fallback: log the issue but continue processing
-					Noisium.LOGGER.warn("Failed to call interpolateZ on interpolator: {}", e.getMessage());
-				}
-			}
-		}
-	}
-
-	/**
-	 * Optimized interpolateZ implementation using quarter-step optimization.
-	 * Applies optimized interpolation to all density interpolators with quarter-step specialization.
-	 */
-	@Unique  
-	private void noisium$optimizedInterpolateZ(int blockZ, double deltaZ) {
-		// Check if deltaZ matches any of our optimized quarter-step values
-		// Based on runtime analysis: 0.0, 0.25, 0.5, 0.75 are most common
-		boolean isQuarterStep = (deltaZ == 0.0 || deltaZ == 0.25 || deltaZ == 0.5 || deltaZ == 0.75);
+		++noisium$interpolateZCalls;
 		
-		if (this.interpolators != null) {
-			for (Object interpolator : this.interpolators) {
-				try {
-					if (isQuarterStep) {
-						// Use specialized quarter-step interpolation
-						noisium$optimizedInterpolateZForInterpolator(interpolator, blockZ, deltaZ);
-					} else {
-						// Fall back to original method for non-quarter values  
-						interpolator.getClass().getMethod("interpolateZ", int.class, double.class)
-							.invoke(interpolator, blockZ, deltaZ);
-					}
-				} catch (Exception e) {
-					// Fallback: log the issue but continue processing
-					Noisium.LOGGER.warn("Failed to call optimized interpolateZ on interpolator: {}", e.getMessage());
-				}
-			}
+		// Count quarter-step occurrences for performance analysis
+		if (deltaZ == 0.0 || deltaZ == 0.25 || deltaZ == 0.5 || deltaZ == 0.75 || deltaZ == 1.0) {
+			noisium$quarterStepCount++;
+		}
+		
+		if (noisium$loggingEnabled && (noisium$interpolateZCalls % 1000 == 0)) {
+			Noisium.LOGGER.info("interpolateZ called {} times (blockZ={}, deltaZ={}, quarter-steps: {})", 
+				noisium$interpolateZCalls, blockZ, deltaZ, noisium$quarterStepCount);
 		}
 	}
 	
-	/**
-	 * Quarter-step optimized interpolation for a single interpolator.
-	 * Uses specialized paths for common delta values to eliminate general lerp overhead.
-	 */
-	@Unique
-	private void noisium$optimizedInterpolateZForInterpolator(Object interpolator, int blockZ, double deltaZ) {
-		try {
-			// This is where we would implement the optimized interpolation logic
-			// For now, we'll use the same method but with potential for specialized optimization
-			// TODO: Access interpolator's internal arrays and apply quarter-step optimization directly
-			
-			// Fallback to standard method - this will be replaced with direct array manipulation
-			interpolator.getClass().getMethod("interpolateZ", int.class, double.class)
-				.invoke(interpolator, blockZ, deltaZ);
-			
-		} catch (Exception e) {
-			Noisium.LOGGER.warn("Failed in optimized interpolateZ for quarter-step: {}", e.getMessage());
-		}
-	}
+	// DISABLED: @Redirect approach - ChunkNoiseSampler interpolation methods may not use MathHelper.lerp
+	// The Mixin transformer can't find the target methods, suggesting they use a different approach
+	// 
+	// Keeping the optimized lerp method for potential future use with a different targeting strategy
+	//
+	// @Redirect(method = "interpolateZ", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;lerp(DDD)D"))
+	// public double noisium$optimizeZLerp(double delta, double start, double end) {
+	// 	return noisium$optimizationEnabled ? noisium$optimizedLerp(delta, start, end) : 
+	// 		net.minecraft.util.math.MathHelper.lerp(delta, start, end);
+	// }
+	
+
 	
 	/**
 	 * Optimized linear interpolation using quarter-step specialization + FMA.
@@ -232,15 +164,32 @@ public abstract class ChunkNoiseSamplerMixin {
 		}
 	}
 
+
+	
 	/**
-	 * Legacy FMA lerp method for compatibility.
-	 * Kept for any places that might still need the general implementation.
+	 * Try to demonstrate a working optimization by hooking after interpolateZ completes.
+	 * This proves we can access the interpolators and potentially optimize them.
 	 */
-	@Unique
-	private static double noisium$lerp(double delta, double start, double end) {
-		// Use FMA (Fused Multiply-Add) for better precision and performance
-		// Computes: delta * (end - start) + start
-		return Math.fma(delta, end - start, start);
+	@Inject(method = "interpolateZ", at = @At("RETURN"))
+	public void noisium$demonstrateOptimization(int blockZ, double deltaZ, CallbackInfo ci) {
+		// Only run occasionally to avoid performance impact
+		if (noisium$optimizationEnabled && (noisium$interpolateZCalls % 10000 == 0)) {
+			// This demonstrates we can access the interpolators list
+			if (this.interpolators != null) {
+				if (noisium$loggingEnabled) {
+					Noisium.LOGGER.info("ChunkNoiseSampler has {} interpolators, last deltaZ: {}", 
+						this.interpolators.size(), deltaZ);
+				}
+				
+				// This is where we would apply our optimization
+				// For quarter-step values, we could potentially cache results
+				// or use specialized interpolation algorithms
+				if (deltaZ == 0.0 || deltaZ == 0.25 || deltaZ == 0.5 || deltaZ == 0.75) {
+					// Mark that we found a quarter-step opportunity
+					// In a real optimization, we would apply faster math here
+				}
+			}
+		}
 	}
 	
 	/**
@@ -252,8 +201,14 @@ public abstract class ChunkNoiseSamplerMixin {
 		Noisium.LOGGER.info("=== ChunkNoiseSampler Interpolation Statistics ===");
 		Noisium.LOGGER.info("interpolateX calls: {}", noisium$interpolateXCalls);
 		Noisium.LOGGER.info("interpolateY calls: {}", noisium$interpolateYCalls);
-		Noisium.LOGGER.info("interpolateZ calls: {}", noisium$interpolateZCalls);
+		Noisium.LOGGER.info("interpolateZ calls: {} (quarter-steps: {})", 
+			noisium$interpolateZCalls, noisium$quarterStepCount);
 		Noisium.LOGGER.info("Total interpolation calls: {}", 
 			noisium$interpolateXCalls + noisium$interpolateYCalls + noisium$interpolateZCalls);
+		
+		if (noisium$interpolateZCalls > 0) {
+			double quarterStepPercentage = (double) noisium$quarterStepCount / noisium$interpolateZCalls * 100.0;
+			Noisium.LOGGER.info("Quarter-step optimization potential: {:.1f}%", quarterStepPercentage);
+		}
 	}
 }
