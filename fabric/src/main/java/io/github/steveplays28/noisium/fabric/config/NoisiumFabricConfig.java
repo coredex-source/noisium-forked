@@ -25,7 +25,6 @@ public class NoisiumFabricConfig {
         public boolean generationShapeConfig = true;
         public boolean chunkSection = true;
         public boolean chainedBlockSource = true;
-        public boolean chunkNoiseSamplerInterpolation = true;
         public boolean useGuiGraphics = true;
     }
 
@@ -64,7 +63,6 @@ public class NoisiumFabricConfig {
                 config.generationShapeConfig,
                 config.chunkSection,
                 config.chainedBlockSource,
-                config.chunkNoiseSamplerInterpolation,
                 config.useGuiGraphics
         );
     }

@@ -3,6 +3,5 @@
   "generationShapeConfig": true,
   "chunkSection": true,
   "chainedBlockSource": true,
-  "chunkNoiseSamplerInterpolation": true,
   "useGuiGraphics": true
 }

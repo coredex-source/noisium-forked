@@ -13,12 +13,11 @@ public class Noisium {
 		LOGGER.info("Loading {}.", MOD_NAME);
 		// Load bundled config (shared between Fabric and NeoForge)
 		NoisiumConfig.loadFromResource(LOGGER);
-		LOGGER.info("Noisium config: noiseChunkGenerator={}, generationShapeConfig={}, chunkSection={}, chainedBlockSource={}, chunkNoiseSamplerInterpolation={}, useGuiGraphics={}",
+		LOGGER.info("Noisium config: noiseChunkGenerator={}, generationShapeConfig={}, chunkSection={}, chainedBlockSource={}, useGuiGraphics={}",
 				NoisiumConfig.get().noiseChunkGenerator,
 				NoisiumConfig.get().generationShapeConfig,
 				NoisiumConfig.get().chunkSection,
 				NoisiumConfig.get().chainedBlockSource,
-				NoisiumConfig.get().chunkNoiseSamplerInterpolation,
 				NoisiumConfig.get().useGuiGraphics
 		);
 	}
