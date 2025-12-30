@@ -18,53 +18,50 @@ public class NoisiumNeoForge {
         
         // Register config screen factory using reflection to avoid compile-time dependency on client classes
         try {
-            // Load the IConfigScreenFactory class
-            Class<?> screenFactoryClass = Class.forName("net.neoforged.neoforge.client.gui.IConfigScreenFactory");
-            
-            // Create a proxy that implements IConfigScreenFactory
-            Object screenFactory = java.lang.reflect.Proxy.newProxyInstance(
-                screenFactoryClass.getClassLoader(),
-                new Class<?>[] { screenFactoryClass },
-                (proxy, method, args) -> {
-                    // args[0] = minecraft, args[1] = parent screen
-                    try {
-                        Class<?> configScreenClass = Class.forName("net.neoforged.neoforge.client.gui.ConfigurationScreen");
-                        
-                        // Get the Screen class from the parent argument instead of using Class.forName
-                        // This avoids issues with remapped client classes
-                        Class<?> screenClass = args[1].getClass().getSuperclass();
-                        while (screenClass != null && !screenClass.getSimpleName().equals("Screen")) {
-                            screenClass = screenClass.getSuperclass();
+            try {
+                Class.forName("net.minecraft.client.Minecraft");
+            } catch (ClassNotFoundException cnfe) {
+                Noisium.LOGGER.info("Client classes not found; skipping config screen registration");
+            }
+
+            if (Thread.currentThread() != null) {
+                try {
+                    Class.forName("net.minecraft.client.Minecraft");
+                    Class<?> screenFactoryClass = Class.forName("net.neoforged.neoforge.client.gui.IConfigScreenFactory");
+                    Object screenFactory = java.lang.reflect.Proxy.newProxyInstance(
+                        screenFactoryClass.getClassLoader(),
+                        new Class<?>[] { screenFactoryClass },
+                        (proxy, method, args) -> {
+                            try {
+                                Class<?> configScreenClass = Class.forName("net.neoforged.neoforge.client.gui.ConfigurationScreen");
+                                Class<?> screenClass = args[1].getClass().getSuperclass();
+                                while (screenClass != null && !screenClass.getSimpleName().equals("Screen")) {
+                                    screenClass = screenClass.getSuperclass();
+                                }
+                                if (screenClass == null) {
+                                    Noisium.LOGGER.error("Could not find Screen class!");
+                                    return args[1];
+                                }
+                                java.lang.reflect.Constructor<?> constructor = configScreenClass.getConstructor(
+                                    Class.forName("net.neoforged.fml.ModContainer"),
+                                    screenClass
+                                );
+                                return constructor.newInstance(container, args[1]);
+                            } catch (Exception e) {
+                                Noisium.LOGGER.error("Failed to create config screen: " + e.getMessage());
+                                return args[1];
+                            }
                         }
-                        
-                        if (screenClass == null) {
-                            Noisium.LOGGER.error("Could not find Screen class!");
-                            return args[1];
+                    );
+                    java.util.function.Supplier<?> factorySupplier = () -> screenFactory;
+                    for (java.lang.reflect.Method method : container.getClass().getMethods()) {
+                        if (method.getName().equals("registerExtensionPoint") && method.getParameterCount() == 2) {
+                            method.invoke(container, screenFactoryClass, factorySupplier);
+                            Noisium.LOGGER.info("Successfully registered NeoForge config screen");
+                            break;
                         }
-                        
-                        // Create ConfigurationScreen(ModContainer container, Screen parent)
-                        // ConfigurationScreen will automatically find all configs registered to this container
-                        java.lang.reflect.Constructor<?> constructor = configScreenClass.getConstructor(
-                            Class.forName("net.neoforged.fml.ModContainer"),
-                            screenClass
-                        );
-                        return constructor.newInstance(container, args[1]);
-                    } catch (Exception e) {
-                        Noisium.LOGGER.error("Failed to create config screen: " + e.getMessage());
-                        return args[1]; // Return parent screen as fallback
                     }
-                }
-            );
-            
-            // Create a Supplier that returns the factory
-            java.util.function.Supplier<?> factorySupplier = () -> screenFactory;
-            
-            // Find and invoke registerExtensionPoint method
-            for (java.lang.reflect.Method method : container.getClass().getMethods()) {
-                if (method.getName().equals("registerExtensionPoint") && method.getParameterCount() == 2) {
-                    method.invoke(container, screenFactoryClass, factorySupplier);
-                    Noisium.LOGGER.info("Successfully registered NeoForge config screen");
-                    break;
+                } catch (ClassNotFoundException e) {
                 }
             }
         } catch (Exception e) {
