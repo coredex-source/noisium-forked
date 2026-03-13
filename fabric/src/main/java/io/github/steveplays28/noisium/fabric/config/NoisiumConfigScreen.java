@@ -1,7 +1,7 @@
 package io.github.steveplays28.noisium.fabric.config;
 
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -28,6 +28,10 @@ public class NoisiumConfigScreen extends Screen {
         int centerX = this.width / 2;
         int y = this.height / 4;
         int rowHeight = 24;
+
+        StringWidget titleWidget = this.addRenderableWidget(new StringWidget(this.title, this.font));
+        titleWidget.setX(centerX - this.font.width(this.title) / 2);
+        titleWidget.setY(20);
 
         this.addRenderableWidget(toggleButton(
                 centerX - 155,
@@ -86,12 +90,6 @@ public class NoisiumConfigScreen extends Screen {
         if (this.minecraft != null) {
             this.minecraft.setScreen(this.parent);
         }
-    }
-
-    @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
     }
 
     private Button toggleButton(int x, int y, Component label, Supplier<Boolean> getter, Consumer<Boolean> setter) {

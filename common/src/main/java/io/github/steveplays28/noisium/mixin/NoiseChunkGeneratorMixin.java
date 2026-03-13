@@ -55,7 +55,7 @@ public abstract class NoiseChunkGeneratorMixin extends ChunkGenerator {
 	 * and by replacing {@code foreach} with {@code fori}.
 	 */
 	@Overwrite
-	private @Nullable ChunkAccess method_38332(@NotNull ChunkAccess chunk, int generationShapeHeightFloorDiv, @NotNull NoiseSettings generationShapeConfig, int minimumY, @NotNull Blender blender, @NotNull StructureManager structureAccessor, @NotNull RandomState noiseConfig, int minimumYFloorDiv) {
+	private @Nullable ChunkAccess lambda$fillFromNoise$0(@NotNull ChunkAccess chunk, int generationShapeHeightFloorDiv, @NotNull NoiseSettings generationShapeConfig, int minimumY, @NotNull Blender blender, @NotNull StructureManager structureAccessor, @NotNull RandomState noiseConfig, int minimumYFloorDiv) {
 		final int startingChunkSectionIndex = chunk.getSectionIndex(
 				generationShapeHeightFloorDiv * generationShapeConfig.getCellHeight() - 1 + minimumY);
 		final int minimumYChunkSectionIndex = chunk.getSectionIndex(minimumY);
