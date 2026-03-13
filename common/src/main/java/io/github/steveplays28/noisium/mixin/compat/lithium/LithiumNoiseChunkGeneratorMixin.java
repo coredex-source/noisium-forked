@@ -1,15 +1,15 @@
 package io.github.steveplays28.noisium.mixin.compat.lithium;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.world.biome.source.BiomeSource;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.gen.StructureAccessor;
-import net.minecraft.world.gen.chunk.Blender;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
-import net.minecraft.world.gen.chunk.GenerationShapeConfig;
-import net.minecraft.world.gen.chunk.NoiseChunkGenerator;
-import net.minecraft.world.gen.noise.NoiseConfig;
+import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+import net.minecraft.world.level.levelgen.NoiseSettings;
+import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.blending.Blender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,19 +18,19 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(NoiseChunkGenerator.class)
+@Mixin(NoiseBasedChunkGenerator.class)
 public abstract class LithiumNoiseChunkGeneratorMixin extends ChunkGenerator {
 	@Shadow
-	protected abstract Chunk populateNoise(Blender blender, StructureAccessor structureAccessor, NoiseConfig noiseConfig, Chunk chunk, int minimumCellY, int cellHeight);
+	protected abstract ChunkAccess doFill(Blender blender, StructureManager structureAccessor, RandomState noiseConfig, ChunkAccess chunk, int minimumCellY, int cellHeight);
 
 	public LithiumNoiseChunkGeneratorMixin(BiomeSource biomeSource) {
 		super(biomeSource);
 	}
 
-	@Redirect(method = "populateNoise(Lnet/minecraft/world/gen/chunk/Blender;Lnet/minecraft/world/gen/StructureAccessor;Lnet/minecraft/world/gen/noise/NoiseConfig;Lnet/minecraft/world/chunk/Chunk;II)Lnet/minecraft/world/chunk/Chunk;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/chunk/ChunkSection;setBlockState(IIILnet/minecraft/block/BlockState;Z)Lnet/minecraft/block/BlockState;"))
-	private BlockState noisium$populateNoiseWrapSetBlockStateOperation(@NotNull ChunkSection chunkSection, int chunkSectionBlockPosX, int chunkSectionBlockPosY, int chunkSectionBlockPosZ, @NotNull BlockState blockState, boolean lock) {
+	@Redirect(method = "doFill(Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/chunk/ChunkAccess;II)Lnet/minecraft/world/level/chunk/ChunkAccess;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/LevelChunkSection;setBlockState(IIILnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;"))
+	private BlockState noisium$populateNoiseWrapSetBlockStateOperation(@NotNull LevelChunkSection chunkSection, int chunkSectionBlockPosX, int chunkSectionBlockPosY, int chunkSectionBlockPosZ, @NotNull BlockState blockState, boolean lock) {
 		// Set the blockstate directly using swapUnsafe for MC 1.21.9+ (similar to biome optimization)
-		chunkSection.blockStateContainer.swapUnsafe(chunkSectionBlockPosX, chunkSectionBlockPosY, chunkSectionBlockPosZ, blockState);
+		chunkSection.getStates().getAndSetUnchecked(chunkSectionBlockPosX, chunkSectionBlockPosY, chunkSectionBlockPosZ, blockState);
 
 		return blockState;
 	}
@@ -41,27 +41,27 @@ public abstract class LithiumNoiseChunkGeneratorMixin extends ChunkGenerator {
 	 * and by replacing {@code foreach} with {@code fori}.
 	 */
 	@Overwrite
-	private @Nullable Chunk method_38332(@NotNull Chunk chunk, int generationShapeHeightFloorDiv, @NotNull GenerationShapeConfig generationShapeConfig, int minimumY, @NotNull Blender blender, @NotNull StructureAccessor structureAccessor, @NotNull NoiseConfig noiseConfig, int minimumYFloorDiv) {
+	private @Nullable ChunkAccess method_38332(@NotNull ChunkAccess chunk, int generationShapeHeightFloorDiv, @NotNull NoiseSettings generationShapeConfig, int minimumY, @NotNull Blender blender, @NotNull StructureManager structureAccessor, @NotNull RandomState noiseConfig, int minimumYFloorDiv) {
 		final int startingChunkSectionIndex = chunk.getSectionIndex(
-				generationShapeHeightFloorDiv * generationShapeConfig.verticalCellBlockCount() - 1 + minimumY);
+				generationShapeHeightFloorDiv * generationShapeConfig.getCellHeight() - 1 + minimumY);
 		final int minimumYChunkSectionIndex = chunk.getSectionIndex(minimumY);
 		// Get the chunk section array from the chunk directly instead of constructing it manually
-		@NotNull final var chunkSections = chunk.getSectionArray();
+		@NotNull final var chunkSections = chunk.getSections();
 		for (int chunkSectionIndex = startingChunkSectionIndex; chunkSectionIndex >= minimumYChunkSectionIndex; --chunkSectionIndex) {
-			chunkSections[chunkSectionIndex].lock();
+			chunkSections[chunkSectionIndex].acquire();
 		}
 
-		@Nullable Chunk chunkWithNoise;
+		@Nullable ChunkAccess chunkWithNoise;
 		try {
-			chunkWithNoise = this.populateNoise(
+			chunkWithNoise = this.doFill(
 					blender, structureAccessor, noiseConfig, chunk, minimumYFloorDiv, generationShapeHeightFloorDiv);
 		} finally {
 			// Replace an enhanced for loop with a fori loop and reuse the chunk sections array used when locking the chunk sections
 			// Also run calculateCounts() on every chunk section to add Lithium compatibility
 			for (int chunkSectionIndex = startingChunkSectionIndex; chunkSectionIndex >= minimumYChunkSectionIndex; --chunkSectionIndex) {
 				@NotNull final var chunkSection = chunkSections[chunkSectionIndex];
-				chunkSection.calculateCounts();
-				chunkSection.unlock();
+				chunkSection.recalcBlockCounts();
+				chunkSection.release();
 			}
 		}
 

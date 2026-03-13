@@ -7,6 +7,6 @@ import io.github.steveplays28.noisium.fabric.config.NoisiumConfigScreen;
 public class NoisiumModMenuIntegration implements ModMenuApi {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return NoisiumConfigScreen::create;
+        return NoisiumConfigScreen::new;
     }
 }

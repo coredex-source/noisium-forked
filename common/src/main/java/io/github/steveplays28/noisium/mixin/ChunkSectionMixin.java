@@ -1,41 +1,41 @@
 package io.github.steveplays28.noisium.mixin;
 
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.BiomeSupplier;
-import net.minecraft.world.biome.source.util.MultiNoiseUtil;
-import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.chunk.PalettedContainer;
-import net.minecraft.world.chunk.ReadableContainer;
+import net.minecraft.core.Holder;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeResolver;
+import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.level.chunk.PalettedContainerRO;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
-@Mixin(ChunkSection.class)
+@Mixin(LevelChunkSection.class)
 public class ChunkSectionMixin {
 	@Unique
 	private static final int noisium$sliceSize = 4;
 
 	@Shadow
-	private ReadableContainer<RegistryEntry<Biome>> biomeContainer;
+	private PalettedContainerRO<Holder<Biome>> biomes;
 
 	/**
 	 * @author Steveplays28
 	 * @reason Axis order micro-optimisation
 	 */
 	@Overwrite
-	public void populateBiomes(BiomeSupplier biomeSupplier, MultiNoiseUtil.MultiNoiseSampler sampler, int x, int y, int z) {
-		PalettedContainer<RegistryEntry<Biome>> palettedContainer = this.biomeContainer.slice();
+	public void fillBiomesFromNoise(BiomeResolver biomeSupplier, Climate.Sampler sampler, int x, int y, int z) {
+		PalettedContainer<Holder<Biome>> palettedContainer = this.biomes.recreate();
 
 		for (int posY = 0; posY < noisium$sliceSize; ++posY) {
 			for (int posZ = 0; posZ < noisium$sliceSize; ++posZ) {
 				for (int posX = 0; posX < noisium$sliceSize; ++posX) {
-					palettedContainer.swapUnsafe(posX, posY, posZ, biomeSupplier.getBiome(x + posX, y + posY, z + posZ, sampler));
+					palettedContainer.getAndSetUnchecked(posX, posY, posZ, biomeSupplier.getNoiseBiome(x + posX, y + posY, z + posZ, sampler));
 				}
 			}
 		}
 
-		this.biomeContainer = palettedContainer;
+		this.biomes = palettedContainer;
 	}
 }

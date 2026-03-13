@@ -1,73 +1,123 @@
 package io.github.steveplays28.noisium.fabric.config;
 
-import io.github.steveplays28.noisium.Noisium;
-import me.shedaniel.clothconfig2.api.ConfigBuilder;
-import me.shedaniel.clothconfig2.api.ConfigCategory;
-import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
- * Cloth Config-based config screen for Fabric.
+ * Native Minecraft config screen implementation with no external UI dependencies.
  */
-public class NoisiumConfigScreen {
-    public static Screen create(Screen parent) {
-        ConfigBuilder builder = ConfigBuilder.create()
-                .setParentScreen(parent)
-                .setTitle(Text.translatable("config.noisium.title"));
+public class NoisiumConfigScreen extends Screen {
+    private final Screen parent;
+    private NoisiumFabricConfig.ConfigData workingConfig;
 
-        builder.setSavingRunnable(() -> {
-            NoisiumFabricConfig.save();
-            Noisium.LOGGER.info("Saved Noisium config");
-        });
+    public NoisiumConfigScreen(Screen parent) {
+        super(Component.translatable("config.noisium.title"));
+        this.parent = parent;
+    }
 
-        ConfigEntryBuilder entryBuilder = builder.entryBuilder();
-        ConfigCategory mixins = builder.getOrCreateCategory(Text.translatable("config.noisium.category.mixins"));
+    @Override
+    protected void init() {
+        this.workingConfig = copy(NoisiumFabricConfig.getConfig());
 
-        NoisiumFabricConfig.ConfigData config = NoisiumFabricConfig.getConfig();
+        int centerX = this.width / 2;
+        int y = this.height / 4;
+        int rowHeight = 24;
 
-        mixins.addEntry(entryBuilder.startBooleanToggle(
-                        Text.translatable("config.noisium.noiseChunkGenerator"),
-                        config.noiseChunkGenerator)
-                .setDefaultValue(true)
-                .setTooltip(Text.translatable("config.noisium.noiseChunkGenerator.tooltip"))
-                .setSaveConsumer(value -> config.noiseChunkGenerator = value)
+        this.addRenderableWidget(toggleButton(
+                centerX - 155,
+                y,
+                Component.translatable("config.noisium.noiseChunkGenerator"),
+                () -> this.workingConfig.noiseChunkGenerator,
+                value -> this.workingConfig.noiseChunkGenerator = value
+        ));
+
+        this.addRenderableWidget(toggleButton(
+                centerX - 155,
+                y + rowHeight,
+                Component.translatable("config.noisium.generationShapeConfig"),
+                () -> this.workingConfig.generationShapeConfig,
+                value -> this.workingConfig.generationShapeConfig = value
+        ));
+
+        this.addRenderableWidget(toggleButton(
+                centerX - 155,
+                y + rowHeight * 2,
+                Component.translatable("config.noisium.chunkSection"),
+                () -> this.workingConfig.chunkSection,
+                value -> this.workingConfig.chunkSection = value
+        ));
+
+        this.addRenderableWidget(toggleButton(
+                centerX - 155,
+                y + rowHeight * 3,
+                Component.translatable("config.noisium.chainedBlockSource"),
+                () -> this.workingConfig.chainedBlockSource,
+                value -> this.workingConfig.chainedBlockSource = value
+        ));
+
+        this.addRenderableWidget(toggleButton(
+                centerX - 155,
+                y + rowHeight * 4,
+                Component.translatable("config.noisium.useGuiGraphics"),
+                () -> this.workingConfig.useGuiGraphics,
+                value -> this.workingConfig.useGuiGraphics = value
+        ));
+
+        this.addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> {
+                    NoisiumFabricConfig.setConfig(this.workingConfig);
+                    this.onClose();
+                })
+                .bounds(centerX - 155, y + rowHeight * 6, 150, 20)
                 .build());
 
-        mixins.addEntry(entryBuilder.startBooleanToggle(
-                        Text.translatable("config.noisium.generationShapeConfig"),
-                        config.generationShapeConfig)
-                .setDefaultValue(true)
-                .setTooltip(Text.translatable("config.noisium.generationShapeConfig.tooltip"))
-                .setSaveConsumer(value -> config.generationShapeConfig = value)
+        this.addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), button -> this.onClose())
+                .bounds(centerX + 5, y + rowHeight * 6, 150, 20)
                 .build());
+    }
 
-        mixins.addEntry(entryBuilder.startBooleanToggle(
-                        Text.translatable("config.noisium.chunkSection"),
-                        config.chunkSection)
-                .setDefaultValue(true)
-                .setTooltip(Text.translatable("config.noisium.chunkSection.tooltip"))
-                .setSaveConsumer(value -> config.chunkSection = value)
-                .build());
+    @Override
+    public void onClose() {
+        if (this.minecraft != null) {
+            this.minecraft.setScreen(this.parent);
+        }
+    }
 
-        mixins.addEntry(entryBuilder.startBooleanToggle(
-                        Text.translatable("config.noisium.chainedBlockSource"),
-                        config.chainedBlockSource)
-                .setDefaultValue(true)
-                .setTooltip(Text.translatable("config.noisium.chainedBlockSource.tooltip"))
-                .setSaveConsumer(value -> config.chainedBlockSource = value)
-                .build());
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
+    }
 
-        ConfigCategory general = builder.getOrCreateCategory(Text.translatable("config.noisium.category.general"));
+    private Button toggleButton(int x, int y, Component label, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+        return Button.builder(toggleText(label, getter.get()), button -> {
+                    boolean next = !getter.get();
+                    setter.accept(next);
+                    button.setMessage(toggleText(label, next));
+                })
+                .bounds(x, y, 310, 20)
+                .build();
+    }
 
-        general.addEntry(entryBuilder.startBooleanToggle(
-                        Text.translatable("config.noisium.useGuiGraphics"),
-                        config.useGuiGraphics)
-                .setDefaultValue(true)
-                .setTooltip(Text.translatable("config.noisium.useGuiGraphics.tooltip"))
-                .setSaveConsumer(value -> config.useGuiGraphics = value)
-                .build());
+    private static MutableComponent toggleText(Component label, boolean enabled) {
+        return Component.empty()
+                .append(label)
+                .append(": ")
+                .append(enabled ? Component.translatable("options.on") : Component.translatable("options.off"));
+    }
 
-        return builder.build();
+    private static NoisiumFabricConfig.ConfigData copy(NoisiumFabricConfig.ConfigData source) {
+        NoisiumFabricConfig.ConfigData copy = new NoisiumFabricConfig.ConfigData();
+        copy.noiseChunkGenerator = source.noiseChunkGenerator;
+        copy.generationShapeConfig = source.generationShapeConfig;
+        copy.chunkSection = source.chunkSection;
+        copy.chainedBlockSource = source.chainedBlockSource;
+        copy.useGuiGraphics = source.useGuiGraphics;
+        return copy;
     }
 }

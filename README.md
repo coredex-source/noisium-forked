@@ -50,7 +50,7 @@ See the [issue tracker](https://github.com/coredex-source/noisium/issues?q=is%3A
 a list of incompatibilities.
 
 See the version info in the filename for the supported Minecraft versions.  
-Made for the Fabric, Quilt, and NeoForge modloaders.  
+Made for the Fabric modloader.  
 Server-side.
 
 ## FAQ
