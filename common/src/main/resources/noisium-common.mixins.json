@@ -2,12 +2,13 @@
   "required": true,
   "minVersion": "0.8",
   "package": "io.github.steveplays28.noisium.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_25",
   "plugin": "io.github.steveplays28.noisium.mixin.NoisiumMixinPlugin",
   "mixins": [
     "ChainedBlockSourceMixin",
     "ChunkSectionMixin",
     "GenerationShapeConfigMixin",
+    "LevelChunkSectionAccessor",
     "NoiseChunkGeneratorMixin",
     "compat.lithium.LithiumNoiseChunkGeneratorMixin"
   ],
